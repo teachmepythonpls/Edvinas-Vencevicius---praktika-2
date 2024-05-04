@@ -1,71 +1,48 @@
 package com.example.edvinasvencevicius_2praktika;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.ListView;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText editText;
-    Spinner spinner;
-    Button countButton;
-    TextView resultTextView;
+    private ArrayList<String> notesList;
+    private ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        editText = findViewById(R.id.editText);
-        spinner = findViewById(R.id.spinner);
-        countButton = findViewById(R.id.countButton);
-        resultTextView = findViewById(R.id.resultTextView);
+        notesList = new ArrayList<>();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notesList);
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.count_types, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-
-        countButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                count();
-            }
-        });
+        ListView listView = findViewById(R.id.listView);
+        listView.setAdapter(adapter);
     }
 
-    private void count() {
-        String text = editText.getText().toString().trim();
-        String countType = spinner.getSelectedItem().toString();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
 
-        if (text.isEmpty()) {
-            showToast(getString(R.string.toast_empty_input));
-            return;
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.create_note) {
+            startActivity(new Intent(MainActivity.this, AddNoteActivity.class));
+            return true;
+        } else if (id == R.id.delete_note) {
+            startActivity(new Intent(MainActivity.this, DeleteNoteActivity.class));
+            return true;
         }
-
-        int count = 0;
-        if (countType.equals(getString(R.string.words))) {
-            count = WordCounter.countWords(text);
-        } else if (countType.equals(getString(R.string.characters))) {
-            count = WordCounter.countCharacters(text);
-        }
-
-        displayResult(count);
-    }
-
-    private void displayResult(int count) {
-        resultTextView.setText(getString(R.string.result_label) + " " + count);
-    }
-
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        return super.onOptionsItemSelected(item);
     }
 }
-
